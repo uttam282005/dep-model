@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-import fetch_weather
+from scripts import fetch_weather
 import joblib
 import pandas as pd
 import os
@@ -22,24 +22,31 @@ except FileNotFoundError:
     print(f"Error: Model file not found at {model_path}")
     exit()
 
+
 @app.route("/predict", methods=["POST"])
 def predict():
     data = request.get_json()
-    
+
     # Calculate soil_fertility_index
-    data['soil_fertility_index'] = data['nitrogen'] + data['phosphorus'] + data['potassium']
-    
+    data["soil_fertility_index"] = (
+        data["nitrogen"] + data["phosphorus"] + data["potassium"]
+    )
+
     # Remove the individual soil components as they weren't used in training
-    del data['nitrogen']
-    del data['phosphorus']
-    del data['potassium']
-    
+    del data["nitrogen"]
+    del data["phosphorus"]
+    del data["potassium"]
+
     input_data = pd.DataFrame([data])
     prediction = model.predict(input_data)
     return jsonify({"prediction": prediction[0]})
+
+
 @app.route("/get-weather/<city>", methods=["GET"])
 def get_weather(city):
     return jsonify(fetch_weather.fetch_current_weather(city))
 
+
 if __name__ == "__main__":
     app.run(debug=True)
+
