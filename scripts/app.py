@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify
-from scripts import fetch_weather
 import joblib
 import pandas as pd
 import os
@@ -40,11 +39,6 @@ def predict():
     input_data = pd.DataFrame([data])
     prediction = model.predict(input_data)
     return jsonify({"prediction": prediction[0]})
-
-
-@app.route("/get-weather/<city>", methods=["GET"])
-def get_weather(city):
-    return jsonify(fetch_weather.fetch_current_weather(city))
 
 
 if __name__ == "__main__":
